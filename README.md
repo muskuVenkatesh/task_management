@@ -1,14 +1,35 @@
-# Task Management System
+Task Management System Overview
+This is a Task Management System built with Laravel that helps teams manage tasks and projects efficiently. It allows you to:
 
-This is a Laravel-based task management system designed to help manage tasks, projects, and team assignments with role-based access control. 
+Create and assign tasks.
+Organize tasks under projects.
+Control access using roles (like Admin, Manager, Team Member).
+How the System Works
+Task Creation & Assignment:
 
-## Features
+Admins and Managers can create tasks and assign them to team members.
+Team Members can only see the tasks assigned to them and update their progress.
+Projects:
 
-- Task creation and assignment
-- Role-based access control using Spatie Laravel Permissions
-- Authentication using Sanctum API middleware
-- CRUD operations for projects, tasks, and users
-- Database seeding
+A Project can have multiple tasks. Managers and Admins can create and manage projects.
+Role-Based Access Control:
+
+The system uses roles to control what users can do. The key roles are:
+Admin: Full access to everything.
+Manager: Can create and assign tasks, but can't manage users.
+Team Member: Can only see and update tasks assigned to them.
+Sanctum API Authentication:
+
+The system uses Sanctum for user authentication, allowing users to log in and interact with the system using tokens (especially useful for mobile apps or frontend apps).
+Spatie Role-Based Permissions:
+
+The Spatie Laravel Permission package is used to manage user roles and permissions.
+Each role is given certain permissions (like creating tasks, assigning tasks, viewing projects, etc.).
+The system checks if a user has the right permissions to perform actions.
+Role-Based Access
+Admins: Can do everything (create tasks, assign tasks, manage users, etc.).
+Managers: Can create and assign tasks, but can't modify user roles.
+Team Members: Can only see tasks assigned to them and update their progress.
 
 ## Installation
 
