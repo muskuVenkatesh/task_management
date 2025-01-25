@@ -1,66 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management System Overview
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a **Task Management System** built with **Laravel** that helps teams manage tasks and projects efficiently. It allows you to:
 
-## About Laravel
+- Create and assign tasks.
+- Organize tasks under projects.
+- Control access using **roles** (like Admin, Manager, Team Member).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## How the System Works
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. **Task Creation & Assignment**:
+   - **Admins and Managers** can create tasks and assign them to team members.
+   - **Team Members** can only see the tasks assigned to them and update their progress.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. **Projects**:
+   - A **Project** can have multiple tasks. Managers and Admins can create and manage projects.
 
-## Learning Laravel
+3. **Role-Based Access Control**:
+   - The system uses **roles** to control what users can do. The key roles are:
+     - **Admin**: Full access to everything.
+     - **Manager**: Can create and assign tasks, but can't manage users.
+     - **Team Member**: Can only see and update tasks assigned to them.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+4. **Sanctum API Authentication**:
+   - The system uses **Sanctum** for user authentication, allowing users to log in and interact with the system using tokens (especially useful for mobile apps or frontend apps).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+5. **Spatie Role-Based Permissions**:
+   - The **Spatie Laravel Permission** package is used to manage user roles and permissions.
+   - Each role is given certain **permissions** (like creating tasks, assigning tasks, viewing projects, etc.).
+   - The system checks if a user has the right permissions to perform actions.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Role-Based Access
 
-## Laravel Sponsors
+- **Admins**: Can do everything (create tasks, assign tasks, manage users, etc.).
+- **Managers**: Can create and assign tasks, but can't modify user roles.
+- **Team Members**: Can only see tasks assigned to them and update their progress.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Database Relationships
 
-### Premium Partners
+Here are the main relationships between the tables in the Task Management System:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+1. **User and Role**:
+   - Users can have a role, and roles define what permissions a user has (e.g., Admin, Manager, Team Member).
+   - **User** `belongsToMany` **Role** (through the `role_user` pivot table).
 
-## Contributing
+2. **Projects and Tasks**:
+   - A **Project** can have multiple **Tasks**.
+   - **Task** `belongsTo` **Project** (each task is associated with a project).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Tasks and Users (Team Members)**:
+   - A **Task** can be assigned to a **User** (Team Member).
+   - **Task** `belongsTo` **User** (each task has one assigned team member).
 
-## Code of Conduct
+4. **Users and Tasks**:
+   - A **User** can have many **Tasks**.
+   - **User** `hasMany` **Task** (a team member can be assigned multiple tasks).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. **Sanctum Authentication**:
+   - Users authenticate using **Sanctum** to interact with the system. This provides API token-based authentication for secure access.
 
-## Security Vulnerabilities
+6. **Role-Based Permissions**:
+   - The system uses **Spatie Laravel Permission** to manage different permissions for roles. For example, an Admin can have full permissions, while a Manager can only assign tasks.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Installation
 
-## License
+To set up the project locally, follow these steps:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 1. Clone the repository
+- git clone https://github.com/muskuVenkatesh/task_management.git
+
+## Steps to setup the project:
+
+- cd task_manage_system
+- composer install
+- cp .env.example .env
+- php artisan migrate
+- php artisan db:seed
+- composer require laravel/sanctum
+- php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+- php artisan migrate
+- composer require spatie/laravel-permission
+- php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+- php artisan migrate
+
+## other commands:
+
+- php artisan cache:clear
+- php artisan config:clear
+- php artisan route:clear
+- php artisan config:cache
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
