@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Projects;
 use Illuminate\Http\Request;
+use App\Events\ProjectCreated;
 use App\Http\Requests\UserRequest;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
@@ -13,30 +14,12 @@ use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 
 class AdminController extends Controller
 {
-    // public function createUser(UserRequest $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string',
-    //         'email' => 'required|email|unique:users',
-    //         'password' => 'required|string|min:8',
-    //         'role_id' => 'required|exists:roles,id',
-    //     ]);
-
-    //     if ($validated['role_id'] == $this->getAdminRoleId()) {
-    //         return response()->json(['error' => 'Admin not allowed to create a user with the Admin role.'], 403);
-    //     }
-    //     $user = User::create([
-    //         'name' => $validated['name'],
-    //         'email' => $validated['email'],
-    //         'password' => bcrypt($validated['password']),
-    //         'role_id' => $validated['role_id'],
-    //     ]);
-    //     return response()->noContent();
-    // }
     public function createUser(UserRequest $request)
     {
-        // Validate input
 
+        if (!auth()->user()->can('create_users')) {
+            return response()->json(['error' => 'User does not have the permission to create a user.'], 403);
+        }
         if (!auth()->user()->hasRole('Admin')) {
             return response()->json(['error' => 'User does not have the Admin role.'], 403);
         }
@@ -44,32 +27,115 @@ class AdminController extends Controller
         $validated = $request->validated();
 
 
-        // Fetch the role by ID
         $role = Role::find($validated['role_id']);
         if (!$role) {
             return response()->json(['error' => 'Role not found.'], 404);
         }
 
-        // Restrict the creation of Admin role users
         if ($role->name === 'Admin') {
             return response()->json(['error' => 'Admin not allowed to create a user with the Admin role.'], 403);
         }
 
-        // Create the user
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']), // Use Hash::make for better security
+            'password' => Hash::make($validated['password']),
         ]);
 
-        // Assign the role to the user
         $user->assignRole($role->name);
 
-        // Return a success response
         return response()->json([
             'message' => 'User created successfully.',
             'user' => $user,
         ], 201);
+    }
+
+    public function getAllUsers()
+    {
+        if (!auth()->user()->can('get_user')) {
+            return response()->json(['error' => 'User does not have permission to view users.'], 403);
+        }
+        $users = User::withoutTrashed()->get();
+        return response()->json([
+            'users' => $users
+        ]);
+    }
+
+
+    public function getUserById($id)
+    {
+
+        if (!auth()->user()->can('get_user')) {
+            return response()->json(['error' => 'User does not have permission to get user.'], 403);
+        }
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+        return response()->json([
+            'message' => 'User retrieved successfully.',
+            'user' => $user,
+        ], 200);
+    }
+
+        public function updateUser(UserRequest $request, $id)
+    {
+        if (!auth()->user()->can('update_users')) {
+            return response()->json(['error' => 'User does not have the permission to update a user.'], 403);
+        }
+
+        if (!auth()->user()->hasRole('Admin')) {
+            return response()->json(['error' => 'User does not have the Admin role.'], 403);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        $validated = $request->validated();
+
+        if (isset($validated['role_id'])) {
+            $role = Role::find($validated['role_id']);
+            if (!$role) {
+                return response()->json(['error' => 'Role not found.'], 404);
+            }
+
+            if ($role->name === 'Admin') {
+                return response()->json(['error' => 'Cannot assign the Admin role to a user.'], 403);
+            }
+
+            $user->syncRoles($role->name);
+        }
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => isset($validated['password']) ? Hash::make($validated['password']) : $user->password,
+        ]);
+
+        return response()->noContent();
+    }
+
+    public function deleteUser($id)
+    {
+        if (!auth()->user()->can('delete_users')) {
+            return response()->json(['error' => 'User does not have the permission to delete a user.'], 403);
+        }
+
+        if (!auth()->user()->hasRole('Admin')) {
+            return response()->json(['error' => 'User does not have the Admin role.'], 403);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        $user->delete();
+        return response()->json([
+            'message' => 'User deleted successfully.',
+        ], 200);
     }
 
 
@@ -103,6 +169,7 @@ class AdminController extends Controller
             'manager_id' => $validated['manager_id'],
             'status' => $validated['status'],
         ]);
+        event(new ProjectCreated($project));
 
         return response()->json(['message' => 'Project created successfully', 'data' => $project], 201);
     }

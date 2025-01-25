@@ -17,26 +17,41 @@ class RoleSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+
+     public function run()
 {
     $permissions = [
         'create_projects',
         'delete_projects',
-        'create_users',
         'update_projects',
         'get_projects',
-        'get_all_projects'
+        'get_all_projects',
+        'create_users',
+        'get_all_users',
+        'update_users',
+        'delete_users',
+        'get_user',
+
+        // Manager permissions
+         'get_manager_projects' ,
+         'get_projects',
+         'update_project' ,
+         'delete_project',
+         'create_task',
+         'update-task',
+         'get_all_tasks',
+         'get_task',
+         'delete_task'
     ];
 
     foreach ($permissions as $permission) {
-        Permission::firstOrCreate(['name' => $permission]);
+        Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
     }
 
-    // Create roles
     $roles = ['Admin', 'Manager', 'Team Member'];
 
     foreach ($roles as $role) {
-        Role::create(['name' => $role]);
+        Role::firstOrCreate(['name' => $role]);
     }
 
     // Assign permissions to roles
@@ -44,15 +59,18 @@ class RoleSeeder extends Seeder
     $managerRole = Role::findByName('Manager');
     $userRole = Role::findByName('Team Member');
 
-    $adminRole->givePermissionTo(['create_projects', 'delete_projects','create_users','update_projects','get_projects','get_all_projects']);
-    // $managerRole->givePermissionTo(['create projects', 'edit projects']);
-    // $userRole->givePermissionTo('create projects');
+    // Assign permissions to Admin role
+    $adminRole->givePermissionTo([
+        'create_projects', 'delete_projects', 'update_projects',
+        'get_projects', 'get_all_projects', 'create_users',
+        'get_all_users', 'update_users', 'delete_users', 'get_user'
+    ]);
 
-    $adminRole = Role::findByName('Admin');
-$managerRole = Role::findByName('Manager');
-$teamMemberRole = Role::findByName('Team Member');
-
-
-
+    $managerRole->givePermissionTo([
+        'get_manager_projects' , 'get_projects','update_project' ,'delete_project',
+        'create_task','update-task','get_all_tasks','get_task','delete_task'
+    ]);
 }
+
+
 }
