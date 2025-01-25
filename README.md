@@ -35,6 +35,32 @@ This is a **Task Management System** built with **Laravel** that helps teams man
 - **Managers**: Can create and assign tasks, but can't modify user roles.
 - **Team Members**: Can only see tasks assigned to them and update their progress.
 
+## Database Relationships
+
+Here are the main relationships between the tables in the Task Management System:
+
+1. **User and Role**:
+   - Users can have a role, and roles define what permissions a user has (e.g., Admin, Manager, Team Member).
+   - **User** `belongsToMany` **Role** (through the `role_user` pivot table).
+
+2. **Projects and Tasks**:
+   - A **Project** can have multiple **Tasks**.
+   - **Task** `belongsTo` **Project** (each task is associated with a project).
+
+3. **Tasks and Users (Team Members)**:
+   - A **Task** can be assigned to a **User** (Team Member).
+   - **Task** `belongsTo` **User** (each task has one assigned team member).
+
+4. **Users and Tasks**:
+   - A **User** can have many **Tasks**.
+   - **User** `hasMany` **Task** (a team member can be assigned multiple tasks).
+
+5. **Sanctum Authentication**:
+   - Users authenticate using **Sanctum** to interact with the system. This provides API token-based authentication for secure access.
+
+6. **Role-Based Permissions**:
+   - The system uses **Spatie Laravel Permission** to manage different permissions for roles. For example, an Admin can have full permissions, while a Manager can only assign tasks.
+
 ## Installation
 
 To set up the project locally, follow these steps:
