@@ -4,10 +4,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +33,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/delete-project/{id}', [AdminController::class, 'deleteProject']);
 
         // User Routes
-
         Route::post('/create-users', [AdminController::class, 'createUser']);
         Route::get('/getall-users', [AdminController::class, 'getAllUsers']);
         Route::get('/get-user/{id}', [AdminController::class, 'getUserById']);
@@ -44,19 +44,25 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Manager Routes
     Route::middleware('role:Manager')->group(function () {
-        Route::post('/get-manager-projects', [ManagerController::class, 'getProjectsByManager']);
-        Route::get('/projects', [ManagerController::class, 'viewProjects']);
+        Route::get('/get-manager-projects', [ManagerController::class, 'getProjectsByManager']);
+        Route::put('/update-project/{id}', [ManagerController::class, 'update']);
+        Route::delete('/delete-project/{id}', [ManagerController::class, 'delete']);
+        Route::post('/assign-task', [ManagerController::class, 'assignTask']);
 
     });
 
     // Team Member Routes
     Route::middleware('role:Team Member')->group(function () {
-        Route::get('/tasks', [TaskController::class, 'viewTasks']);
-        Route::put('/tasks/{task}', [TaskController::class, 'updateTask']);
+        Route::get('/get-assigned-tasks', [TaskController::class, 'getAssignedTasks']);
+        Route::put('/update-task/{id}', [TaskController::class, 'updateTask']);
+        Route::get('tasks/{id}', [TaskController::class, 'getTaskById']);
+        Route::get('/tasks/search', [TaskController::class, 'search']);
     });
 
 });
 
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [RegisteredUserController::class, 'login']);
+
+
 

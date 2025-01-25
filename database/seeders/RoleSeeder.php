@@ -41,7 +41,11 @@ class RoleSeeder extends Seeder
          'update-task',
          'get_all_tasks',
          'get_task',
-         'delete_task'
+         'delete_task',
+
+        //  Team Permissions
+
+        'get_assigned_tasks' ,'update_task' , 'delete_tasks',
     ];
 
     foreach ($permissions as $permission) {
@@ -66,9 +70,17 @@ class RoleSeeder extends Seeder
         'get_all_users', 'update_users', 'delete_users', 'get_user'
     ]);
 
+
+    // Permissions to Manager Role
     $managerRole->givePermissionTo([
         'get_manager_projects' , 'get_projects','update_project' ,'delete_project',
         'create_task','update-task','get_all_tasks','get_task','delete_task'
+    ]);
+
+    // Permissions To Team Member Role
+
+    $managerRole->givePermissionTo([
+        'get_assigned_tasks' ,'update_task' , 'get_task',
     ]);
 }
 
