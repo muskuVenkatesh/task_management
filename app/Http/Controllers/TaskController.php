@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tasks;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskRequest;
+use App\Http\Requests\TaskUpdateRequest;
 
 class TaskController extends Controller
 {
@@ -19,8 +20,8 @@ class TaskController extends Controller
 
     public function updateTask(TaskUpdateRequest $request, $taskId)
     {
-        if (!auth()->user()->can('get_assigned_tasks')) {
-            return response()->json(['error' => 'User does not have the permission to get_assigned_tasks.'], 403);
+        if (!auth()->user()->can('update_task')) {
+            return response()->json(['error' => 'User does not have the permission to update_task.'], 403);
         }
         $task = Tasks::findOrFail($taskId);
 

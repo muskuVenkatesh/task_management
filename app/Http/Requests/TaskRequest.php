@@ -13,7 +13,7 @@ class TaskRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,8 +29,8 @@ class TaskRequest extends FormRequest
             'project_id' => 'required|exists:projects,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'assigned_to' => 'required|exists:users,id|role:Team Member',
-            'status' => 'required|in:pending,ongoing,completed',
+            'assigned_to' => 'required|exists:users,id',
+            'status' => 'required|in:Pending,In Progress,Completed',
         ];
     }
 }

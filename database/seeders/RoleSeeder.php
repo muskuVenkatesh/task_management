@@ -45,7 +45,9 @@ class RoleSeeder extends Seeder
 
         //  Team Permissions
 
-        'get_assigned_tasks' ,'update_task' , 'delete_tasks',
+        'get_assigned_tasks' ,
+        'update_task' ,
+        'delete_tasks',
     ];
 
     foreach ($permissions as $permission) {

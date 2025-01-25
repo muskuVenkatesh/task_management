@@ -30,7 +30,7 @@ class TaskUpdateRequest extends FormRequest
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date|after:start_time',
             'assigned_to' => 'nullable|exists:users,id|role:Team Member',
-            'status' => 'nullable|in:pending,ongoing,completed',
+            'status' => 'nullable|in:Pending,In Progress,Completed',
         ];
     }
 }

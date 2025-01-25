@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Tasks;
 use App\Models\Projects;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskRequest;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ManagerProjectRequest;
 
 class ManagerController extends Controller
@@ -29,7 +31,10 @@ class ManagerController extends Controller
         if (!auth()->user()->can('update_project')) {
             return response()->json(['error' => 'User does not have the permission to update the project.'], 403);
         }
+
+        $user = auth()->user()->id;
         $project = Projects::findOrFail($id);
+        $user = $project->manager_id;
         if ($project->manager_id !== Auth::id()) {
             return response()->json(['error' => 'You are not the owner of this project.'], 403);
         }
@@ -69,13 +74,15 @@ class ManagerController extends Controller
         if (!$teamMember->hasRole('Team Member')) {
             return response()->json(['error' => 'Assigned user is not a team member.'], 403);
         }
+        $start_time = Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s');
+        $end_time = Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s');
 
         $task = Tasks::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
             'project_id' => $validated['project_id'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
+            'start_time' => $start_time,
+            'end_time' => $end_time,
             'assigned_to' => $validated['assigned_to'],
             'status' => $validated['status'],
         ]);
